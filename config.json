@@ -1,0 +1,18 @@
+{
+    "app_name": "文件传输助手",
+    "version": "1.0.0",
+    "description": "一个类似微信文件传输助手的本地存储应用",
+    "author": "",
+    "data_storage": {
+        "location": "local",
+        "format": "json"
+    },
+    "features": [
+        "文本存储",
+        "链接收藏",
+        "文件管理",
+        "图片保存",
+        "搜索功能",
+        "分类浏览"
+    ]
+}
