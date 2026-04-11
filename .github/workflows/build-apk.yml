@@ -8,6 +8,7 @@ on:
 jobs:
   build-apk:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,17 +22,20 @@ jobs:
         run: pip install "flet[cli]>=0.21.0"
 
       - name: Build APK
-        run: flet pack apk main.py
+        run: flet build apk --project main.py
 
-      - name: Find and rename APK
+      - name: Find APK files
         run: |
-          find . -name "*.apk" 2>/dev/null | head -1 | xargs -I{} mv {} file-transfer-assistant.apk 2>/dev/null || true
-          ls -la *.apk 2>/dev/null || echo "No APK found in root"
-          find . -name "*.apk" 2>/dev/null
+          echo "=== Searching for APK files ==="
+          find . -name "*.apk" -type f 2>/dev/null
+          ls -la build/apk/release/*.apk 2>/dev/null || ls -la build/**/*.apk 2>/dev/null || echo "No APK in build dir"
+          ls -la *.apk 2>/dev/null || echo "No APK in root"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: file-transfer-assistant-apk
-          path: "**/*.apk"
+          path: |
+            **/*.apk
           retention-days: 30
+          if-no-files-found: warn
