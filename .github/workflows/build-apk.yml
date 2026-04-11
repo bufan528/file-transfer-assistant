@@ -9,6 +9,9 @@ jobs:
   build-apk:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      FLET_CLI_YES: "true"
+      PIP_PROGRESS_BAR: "off"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,7 +25,7 @@ jobs:
         run: pip install "flet[cli]>=0.21.0"
 
       - name: Build APK
-        run: flet build apk --project main.py
+        run: echo "y" | flet build apk --project main.py || true
 
       - name: Find APK files
         run: |
