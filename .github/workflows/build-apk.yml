@@ -18,14 +18,18 @@ jobs:
           python-version: '3.11'
 
       - name: Install Flet
-        run: pip install flet
+        run: pip install "flet[cli]>=0.21.0"
 
       - name: Build APK
-        run: flet build apk main.py
+        run: flet pack --apk main.py
+
+      - name: Find and rename APK
+        run: |
+          find . -name "*.apk" -exec mv {} file-transfer-assistant.apk \;
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: file-transfer-assistant-apk
-          path: build/apk/release/*.apk
+          path: file-transfer-assistant.apk
           retention-days: 30
