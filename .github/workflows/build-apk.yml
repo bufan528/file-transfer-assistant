@@ -21,15 +21,17 @@ jobs:
         run: pip install "flet[cli]>=0.21.0"
 
       - name: Build APK
-        run: flet pack --apk main.py
+        run: flet pack apk main.py
 
       - name: Find and rename APK
         run: |
-          find . -name "*.apk" -exec mv {} file-transfer-assistant.apk \;
+          find . -name "*.apk" 2>/dev/null | head -1 | xargs -I{} mv {} file-transfer-assistant.apk 2>/dev/null || true
+          ls -la *.apk 2>/dev/null || echo "No APK found in root"
+          find . -name "*.apk" 2>/dev/null
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: file-transfer-assistant-apk
-          path: file-transfer-assistant.apk
+          path: "**/*.apk"
           retention-days: 30
