@@ -94,7 +94,10 @@ class UI:
         self.app_bar = ft.AppBar(
             title=ft.Row([
                 ft.Icon(ft.icons.FOLDER_SHARED, size=28, color=self.colors["primary"]),
-                ft.Text("File Transfer", size=20, weight=ft.FontWeight.W_600, color=self.colors["text"]),
+                ft.Column([
+                    ft.Text("File Transfer", size=18, weight=ft.FontWeight.W_600, color=self.colors["text"]),
+                    ft.Text("v1.1.0", size=11, color=ft.colors.WHITE70),
+                ], spacing=0, tight=True),
             ], spacing=8),
             center_title=False,
             bgcolor=self.colors["primary"],
