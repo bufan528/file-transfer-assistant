@@ -74,8 +74,8 @@ class UI:
                 ft.Icon(ft.icons.FOLDER_SHARED, size=28, color=self.colors["primary"]),
                 ft.Column([
                     ft.Text("File Transfer", size=18, weight=ft.FontWeight.W_600, color=ft.colors.WHITE),
-                    ft.Text("v1.1.0", size=11, color=ft.colors.WHITE70),
-                ], spacing=0, tight=True),
+                    ft.Text("v1.1.0", size=11, color="#B3FFFFFF"),
+                ], spacing=0),
             ], spacing=8),
             center_title=False,
             bgcolor=self.colors["primary"],
@@ -227,7 +227,7 @@ class UI:
         self.detail_title = ft.Text("", size=20, weight=ft.FontWeight.BOLD)
         self.detail_type_badge = ft.Container()
         self.detail_date = ft.Text("", size=12, color=self.colors["text_secondary"])
-        self.detail_content = ft.SelectableText("", size=14, selection_color=self.colors["primary"].with_opacity(0.2))
+        self.detail_content = ft.Text("", size=14)
         
         self.detail_dialog = ft.AlertDialog(modal=True,
             title=ft.Column([self.detail_title, ft.Row([self.detail_type_badge, ft.Container(expand=True), self.detail_date])]),
@@ -237,7 +237,7 @@ class UI:
                 ft.IconButton(icon=ft.icons.CONTENT_COPY, icon_color=self.colors["primary"], on_click=lambda _: self._copy_current_item()),
                 ft.IconButton(icon=ft.icons.DELETE_OUTLINE, icon_color=self.colors["error"], on_click=lambda _: self._delete_from_detail()),
                 ft.ElevatedButton("Close", icon=ft.icons.CLOSE,
-                    style=ft.ButtonStyle(bgcolor=self.colors["background"]), on_click=lambda _: self.page.close(self.detail_dialog))
+                    style=ft.ButtonStyle(bgcolor=self.colors["background"]), on_click=lambda _: self._close_detail_dialog())
             ],
             actions_alignment=ft.MainAxisAlignment.END, shape=ft.RoundedRectangleBorder(radius=20)
         )
@@ -304,7 +304,7 @@ class UI:
             width=52, height=52, bgcolor=config["bg_color"],
             border_radius=ft.border_radius.all(14), alignment=ft.alignment.center)
         
-        card = ft.Card(elevation=2, margin=ft.margin.only(bottom=5), surface_tint_color=ft.colors.TRANSPARENT,
+        card = ft.Card(elevation=2, margin=ft.margin.only(bottom=5),
             child=ft.Container(
                 content=ft.ListTile(
                     leading=leading_avatar,
@@ -319,7 +319,7 @@ class UI:
                         on_click=lambda _, i=item: self._show_item_options(i)),
                     on_click=lambda _, i=item: self._show_detail(i)
                 ),
-                border_radius=ft.border_radius.all(16), clip_behavior=ft.ClipBehavior.ANTI_ALIAS
+                border_radius=ft.border_radius.all(16)
             ))
         return card
 
@@ -338,16 +338,31 @@ class UI:
         try:
             self.current_detail_item = item
             
+            def _view_and_close(e):
+                try: self.page.close(self.options_dlg)
+                except: pass
+                self._show_detail(item)
+            
+            def _copy_and_close(e):
+                try: self.page.close(self.options_dlg)
+                except: pass
+                self._copy_content(item)
+            
+            def _delete_and_close(e):
+                try: self.page.close(self.options_dlg)
+                except: pass
+                self._show_delete_confirm(item)
+            
             options = ft.Column([
                 ft.ListTile(leading=ft.Icon(ft.icons.VISIBILITY, color=self.colors["primary"]),
-                    title=ft.Text("View Details"), on_click=lambda _: [self.page.close(self.options_dlg), self._show_detail(item)]),
+                    title=ft.Text("View Details"), on_click=_view_and_close),
                 ft.Divider(),
                 ft.ListTile(leading=ft.Icon(ft.icons.CONTENT_COPY, color=self.colors["primary"]),
-                    title=ft.Text("Copy Content"), on_click=lambda _: [self.page.close(self.options_dlg), self._copy_content(item)]),
+                    title=ft.Text("Copy Content"), on_click=_copy_and_close),
                 ft.Divider(),
                 ft.ListTile(leading=ft.Icon(ft.icons.DELETE, color=self.colors["error"]),
                     title=ft.Text("Delete", color=self.colors["error"]),
-                    on_click=lambda _: [self.page.close(self.options_dlg), self._show_delete_confirm(item)])
+                    on_click=_delete_and_close)
             ])
             
             self.options_dlg = ft.AlertDialog(
@@ -444,6 +459,12 @@ class UI:
     def _delete_from_detail(self):
         if self.current_detail_item:
             self._show_delete_confirm(self.current_detail_item)
+
+    def _close_detail_dialog(self):
+        try:
+            self.page.close(self.detail_dialog)
+        except:
+            pass
 
     def _show_delete_confirm(self, item):
         try:
